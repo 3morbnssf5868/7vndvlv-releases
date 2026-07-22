@@ -1,18 +1,27 @@
+<div align="center">
+
 # 7vndvlv
 
-> Watch global markets, track a portfolio and backtest strategies — in one
-> native desktop app.
->
-> Built solo, end to end: React + Tauri client, NestJS API, Python quant engine.
+**Watch global markets, track a portfolio and backtest strategies —
+in one native desktop app.**
 
-![Status](https://img.shields.io/badge/status-in%20development-f0b429) ![Version](https://img.shields.io/badge/version-0.1.2-1d8cf8) ![Platform](https://img.shields.io/badge/platform-Windows-6c757d) ![Source](https://img.shields.io/badge/source-private-6c757d)
+Built solo, end to end: React + Tauri client, NestJS API, Python quant engine.
+
+[![Download](https://img.shields.io/badge/Download%20for%20Windows-1d8cf8?style=for-the-badge&logo=windows&logoColor=white)](../../releases/latest)
+
+x86-64 and ARM64 installers · runs offline · no account needed
+
+![Status](https://img.shields.io/badge/status-in%20development-f0b429) ![Version](https://img.shields.io/badge/version-0.1.3-1d8cf8) ![Platform](https://img.shields.io/badge/platform-Windows-6c757d) ![Source](https://img.shields.io/badge/source-private-6c757d)
 
 [Context](#context) · [Features](#features) · [Try it](#try-it) · [Architecture](#architecture--c4-container-view) · [Decisions](#engineering-decisions) · [Problems solved](#problems-solved) · [Stack](#tech-stack) · [Status](#status--limits)
 
+</div>
+
 ![Demo](docs/demo.gif)
 
-*The app running against a local backend, on live data. The published build runs
-the same interface offline — see [Try it](#try-it).*
+*The app running against a local backend, on live data.*
+
+---
 
 ## Context
 
@@ -29,14 +38,20 @@ data and strategy code remain on the machine that runs them.
 
 Approximately 40 commits, June–July 2026.
 
+---
+
 ## Features
 
 **Global market overview** — an interactive world map of exchanges with live
 indices grouped by region, continental panels and world clocks.
 
+![World map with live indices by region](docs/01-overview.png)
+
 **Live news streams** — up to six broadcast channels side by side (France 24,
 Al Jazeera, CNA, Bloomberg, Euronews, NHK World, Sky News, DW, WION, TRT World),
 embedded as rolling live streams so they survive channel restarts.
+
+![Live news channels running under the market panels](docs/09-streams.jpg)
 
 **News feed** — headlines from four wire sources scrolling under the market
 panels.
@@ -45,8 +60,12 @@ panels.
 (beta, Sharpe, alpha), daily and year-to-date P&L, plus cash movements with a
 capital-gains tax estimate.
 
+![Positions, allocation and risk metrics](docs/06-positions.png)
+
 **Charting** — base-100 performance with RSI, MACD and volume overlays on any
 holding or index.
+
+![Base-100 performance chart with RSI, MACD and volume](docs/05-portfolio.png)
 
 **Backtesting** — a Python engine running moving-average crossover strategies over
 up to 10 years of history. Given a ticker, fast and slow windows and a period, the
@@ -54,13 +73,15 @@ engine computes 18 statistics (Sharpe, Sortino, max drawdown, win rate, expectan
 fees), an equity curve against benchmark and a full trade log. The app currently
 surfaces the summary return — the full report view is in progress.
 
+![Strategy panel with the backtest result and saved strategies](docs/07-backtest.png)
+
 **Price alerts** — per-instrument thresholds delivered over a WebSocket gateway.
+
+![Notification centre with price thresholds and triggered alerts](docs/08-alerts.png)
 
 **Authentication** — JWT sessions with TOTP multi-factor and bcrypt hashing.
 
-| Market overview | Portfolio chart | Positions & risk |
-|---|---|---|
-| ![Global market overview](docs/01-overview.png) | ![Portfolio performance chart](docs/05-portfolio.png) | ![Positions and risk metrics](docs/06-positions.png) |
+---
 
 ## Try it
 
@@ -75,9 +96,11 @@ banner states as much.
 
 Two things to know before downloading:
 
-- Current builds target **ARM64 Windows** only — an x86-64 build is not published yet.
+- Installers are provided for **x86-64** and **ARM64** Windows.
 - The installer carries no Windows code-signing certificate, so SmartScreen will
   warn on first run.
+
+---
 
 ## Architecture — C4 container view
 
@@ -111,16 +134,20 @@ parses it; the process then exits. No queue, no broker, no shared state. The cos
 is roughly 200–400 ms of interpreter startup per request; the benefit is that a
 script that hangs or crashes can never poison the API.
 
+---
+
 ## Engineering decisions
 
 | Decision | Why | Alternative rejected | Trade-off accepted |
 |---|---|---|---|
-| **Tauri v2** for the desktop shell | A 3.4 MB installer and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
+| **Tauri v2** for the desktop shell | Installers under 4 MB and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
 | **One-shot Python processes** | Each request spawns a script and reads JSON off its stdout; pandas and yfinance never share state with the Node process | A long-lived Python service | 200–400 ms of interpreter startup on every request |
 | **Session in a cookie *and* a Bearer token** | The Tauri webview has no usable cookie jar — the cookie is dropped silently, with no error to catch | Cookie only | Two session paths to keep in sync, and a token reachable from JavaScript |
 | **Hash routing and self-hosted fonts** | The bundled app must render with no network at all | Browser routing + Google Fonts | A `#` in every URL, and font files carried in the bundle |
 | **`native-tls` over `rustls`** | `rustls` pulls in `ring`, which needs a clang toolchain on Windows; SChannel already ships with the OS | `rustls` | TLS behaviour follows the host OS store instead of being identical everywhere |
 | **Offline mode by intercepting one fetch chokepoint** | Every HTTP call already funnelled through a single function, so offline support cost one modified function instead of 26 mocked components | Per-component mocks | Frozen fixtures age with every market day, and WebSocket traffic bypasses the chokepoint |
+
+---
 
 ## Problems solved
 
@@ -151,6 +178,8 @@ eighteen routes sit behind that login gate.
 layer serves 32 routes from fixtures captured off the real service, opens the gate
 with a demo session, and shows a banner stating that the data is frozen.
 
+---
+
 ## Tech stack
 
 | Layer | Technology |
@@ -164,6 +193,8 @@ with a demo session, and shows a banner stating that the data is frozen.
 | Quant / data | Python — yfinance, pandas, moving-average backtest engine |
 | Packaging | Dockerfile for the API |
 
+---
+
 ## Status & limits
 
 In active development. What follows is what the app does not do yet.
@@ -174,7 +205,6 @@ In active development. What follows is what the app does not do yet.
   implemented, but no server-side guard enforces them — the API trusts its caller.
   Acceptable while it listens on localhost; the first thing to fix before any
   deployment.
-- **Builds target ARM64 Windows.** The development machine is Windows-on-ARM.
 - **The backend is not hosted.** The desktop client expects an API on localhost, or
   falls back to offline mode.
 - **Two pages are scaffolding.** The screener and the strategy repository have
@@ -187,7 +217,6 @@ In active development. What follows is what the app does not do yet.
 - The full backtest report — the equity curve, drawdown and trade log are computed
   and returned today, but nothing renders them
 - Thematic sector watch — the dial is in place, the feeds are not wired
-- An x86-64 Windows build
 - Server-side authorisation
 - Broker integration for live orders — a goal, not started
 
