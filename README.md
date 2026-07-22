@@ -14,9 +14,9 @@ In development · **v0.1.3** · Windows · Source private
 
 </div>
 
-![Demo](docs/demo.gif)
+![Demo](docs/demo.webp)
 
-*The app running against a local backend, on live data.*
+*Five screens of the app running in its offline demonstration mode.*
 
 ---
 
