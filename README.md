@@ -2,8 +2,9 @@
 
 # 7vndvlv
 
-**Watch global markets, track a portfolio and backtest strategies —
-in one native desktop app.**
+**The goal: one desktop workspace for the entire investing loop.**
+
+From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
 [![Download for Windows](docs/download-button.svg)](../../releases/latest)
 
