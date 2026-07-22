@@ -5,8 +5,6 @@
 **Watch global markets, track a portfolio and backtest strategies —
 in one native desktop app.**
 
-Built solo, end to end: React + Tauri client, NestJS API, Python quant engine.
-
 [![Download for Windows](docs/download-button.svg)](../../releases/latest)
 
 In development · **v0.1.3** · Windows · Source private
