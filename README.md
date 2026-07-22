@@ -10,7 +10,7 @@ From global markets and live news channels to a broker-connected portfolio, pric
 
 In development · **v0.1.3** · Windows · Source private
 
-[**What it does**](#features) · [**Try it**](#try-it) · [**How it's built**](#architecture--c4-container-view)
+[**Features**](#features) · [**Demo**](#try-it) · [**Architecture**](#architecture--c4-container-view) · [**Decisions**](#engineering-decisions) · [**Roadmap**](#status--limits)
 
 </div>
 
