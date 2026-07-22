@@ -11,7 +11,7 @@ Built solo, end to end: React + Tauri client, NestJS API, Python quant engine.
 
 x86-64 and ARM64 installers · runs offline · no account needed
 
-![Status](https://img.shields.io/badge/status-in%20development-f0b429) ![Version](https://img.shields.io/badge/version-0.1.3-1d8cf8) ![Platform](https://img.shields.io/badge/platform-Windows-6c757d) ![Source](https://img.shields.io/badge/source-private-6c757d)
+In development · **v0.1.3** · Windows · Source private
 
 [Context](#context) · [Features](#features) · [Try it](#try-it) · [Architecture](#architecture--c4-container-view) · [Decisions](#engineering-decisions) · [Problems solved](#problems-solved) · [Stack](#tech-stack) · [Status](#status--limits)
 
