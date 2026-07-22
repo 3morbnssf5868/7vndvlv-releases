@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="252" height="52" viewBox="0 0 252 52" role="img" aria-label="Download for Windows">
+  <title>Download for Windows</title>
+  <defs>
+    <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d9dff"/>
+      <stop offset="1" stop-color="#1668d6"/>
+    </linearGradient>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#1668d6" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <rect x="2" y="2" width="248" height="44" rx="22" fill="url(#fill)" filter="url(#lift)"/>
+
+  <!-- Logo Windows en quatre panneaux -->
+  <g fill="#ffffff" transform="translate(26,15)">
+    <path d="M0 2.2 7.3 1.2v7H0z"/>
+    <path d="M8.6 1 18 0v8.2H8.6z"/>
+    <path d="M0 9.4h7.3v7L0 15.4z"/>
+    <path d="M8.6 9.4H18v8.2L8.6 16.4z"/>
+  </g>
+
+  <text x="58" y="30" fill="#ffffff" font-size="15" font-weight="600"
+        font-family="'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif">Download for Windows</text>
+</svg>

@@ -7,9 +7,7 @@ in one native desktop app.**
 
 Built solo, end to end: React + Tauri client, NestJS API, Python quant engine.
 
-[![Download](https://img.shields.io/badge/Download%20for%20Windows-1d8cf8?style=for-the-badge&logo=windows&logoColor=white)](../../releases/latest)
-
-x86-64 and ARM64 installers · runs offline · no account needed
+[![Download for Windows](docs/download-button.svg)](../../releases/latest)
 
 In development · **v0.1.3** · Windows · Source private
 
