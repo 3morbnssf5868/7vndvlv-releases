@@ -42,13 +42,9 @@ Approximately 40 commits, June–July 2026.
 **Global market overview** — an interactive world map of exchanges with live
 indices grouped by region, continental panels and world clocks.
 
-![World map with live indices by region](docs/01-overview.png)
-
 **Live news streams** — up to six broadcast channels side by side (France 24,
 Al Jazeera, CNA, Bloomberg, Euronews, NHK World, Sky News, DW, WION, TRT World),
 embedded as rolling live streams so they survive channel restarts.
-
-![Live news channels running under the market panels](docs/09-streams.jpg)
 
 **News feed** — headlines from four wire sources scrolling under the market
 panels.
@@ -57,12 +53,8 @@ panels.
 (beta, Sharpe, alpha), daily and year-to-date P&L, plus cash movements with a
 capital-gains tax estimate.
 
-![Positions, allocation and risk metrics](docs/06-positions.png)
-
 **Charting** — base-100 performance with RSI, MACD and volume overlays on any
 holding or index.
-
-![Base-100 performance chart with RSI, MACD and volume](docs/05-portfolio.png)
 
 **Backtesting** — a Python engine running moving-average crossover strategies over
 up to 10 years of history. Given a ticker, fast and slow windows and a period, the
@@ -70,13 +62,7 @@ engine computes 18 statistics (Sharpe, Sortino, max drawdown, win rate, expectan
 fees), an equity curve against benchmark and a full trade log. The app currently
 surfaces the summary return — the full report view is in progress.
 
-![Strategy panel with the backtest result and saved strategies](docs/07-backtest.png)
-
 **Price alerts** — per-instrument thresholds delivered over a WebSocket gateway.
-
-![Notification centre with price thresholds and triggered alerts](docs/08-alerts.png)
-
-**Authentication** — JWT sessions with TOTP multi-factor and bcrypt hashing.
 
 ---
 
