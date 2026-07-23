@@ -16,7 +16,7 @@ In development · **v0.1.3** · Windows · Source private
 
 ![Demo](docs/demo.webp)
 
-*Five screens of the app running in its offline demonstration mode.*
+*Five screens of v0.1.3 running in its offline demonstration mode.*
 
 ---
 
