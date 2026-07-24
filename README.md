@@ -91,7 +91,7 @@ Android asks you to allow the source once, then install.
 
 ```mermaid
 flowchart TB
-    subgraph client["Desktop client — Tauri v2 (Rust)"]
+    subgraph client["Client — Tauri v2 · Windows & Android"]
         ui["React 18 + TypeScript<br/>ECharts · MapLibre GL"]
     end
 
@@ -130,6 +130,7 @@ script that hangs or crashes can never poison the API.
 | **Session in a cookie *and* a Bearer token** | The Tauri webview has no usable cookie jar — the cookie is dropped silently, with no error to catch | Cookie only | Two session paths to keep in sync, and a token reachable from JavaScript |
 | **Hash routing and self-hosted fonts** | The bundled app must render with no network at all | Browser routing + Google Fonts | A `#` in every URL, and font files carried in the bundle |
 | **`native-tls` over `rustls`** | `rustls` pulls in `ring`, which needs a clang toolchain on Windows; SChannel already ships with the OS | `rustls` | TLS behaviour follows the host OS store instead of being identical everywhere |
+| **Updater excluded from the Android build** | `native-tls` uses the Windows cert store but drags in OpenSSL, which won't cross-compile for Android | A single cross-platform updater | Android checks GitHub Releases in-app instead of updating silently |
 | **Offline mode by intercepting one fetch chokepoint** | Every HTTP call already funnelled through a single function, so offline support cost one modified function instead of 26 mocked components | Per-component mocks | Frozen fixtures age with every market day, and WebSocket traffic bypasses the chokepoint |
 
 ---
@@ -169,7 +170,7 @@ with a demo session, and shows a banner stating that the data is frozen.
 
 | Layer | Technology |
 |---|---|
-| Desktop shell | Tauri v2 (Rust) — NSIS and MSI bundles, minisign-signed update manifest |
+| Shell | Tauri v2 (Rust) — Windows (NSIS/MSI) and Android (APK); minisign-signed desktop updater |
 | Frontend | React 18 + TypeScript, Vite, ECharts, MapLibre GL |
 | Real-time | Socket.IO — two gateways |
 | Backend | NestJS — 11 REST modules |
@@ -190,7 +191,7 @@ In active development. What follows is what the app does not do yet.
   implemented, but no server-side guard enforces them — the API trusts its caller.
   Acceptable while it listens on localhost; the first thing to fix before any
   deployment.
-- **The backend is not hosted.** The desktop client expects an API on localhost, or
+- **The backend is not hosted.** The client expects an API on localhost, or
   falls back to offline mode.
 - **Two pages are scaffolding.** The screener and the strategy repository have
   routes and headers, but no data view yet.
