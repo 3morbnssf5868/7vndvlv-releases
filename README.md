@@ -2,7 +2,7 @@
 
 # 7vndvlv
 
-**The goal: one desktop workspace for the entire investing loop.**
+**The goal: one workspace for the entire investing loop.**
 
 From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
