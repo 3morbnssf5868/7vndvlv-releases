@@ -28,32 +28,17 @@ over June–July 2026.
 
 ## Features
 
-The workspace covers the loop end to end — markets in, decisions out:
+Markets in, decisions out:
 
-**Global market overview** — an interactive world map of exchanges with live
-indices grouped by region, continental panels and world clocks.
-
-**Live news streams** — up to six broadcast channels side by side (France 24,
-Al Jazeera, CNA, Bloomberg, Euronews, NHK World, Sky News, DW, WION, TRT World),
-embedded as rolling live streams so they survive channel restarts.
-
-**News feed** — headlines from four wire sources scrolling under the market
-panels.
-
-**Portfolio tracking** — holdings and allocation by asset class, risk metrics
-(beta, Sharpe, alpha), daily and year-to-date P&L, plus cash movements with a
-capital-gains tax estimate.
-
-**Charting** — base-100 performance with RSI, MACD and volume overlays on any
-holding or index.
-
-**Backtesting** — a Python engine running moving-average crossover strategies over
-up to 10 years of history. Given a ticker, fast and slow windows and a period, the
-engine computes 18 statistics (Sharpe, Sortino, max drawdown, win rate, expectancy,
-fees), an equity curve against benchmark and a full trade log. The app currently
-surfaces the summary return — the full report view is in progress.
-
-**Price alerts** — per-instrument thresholds delivered over a WebSocket gateway.
+|  |  |
+|---|---|
+| **Global market overview** | World map of exchanges, live indices by region, continental panels, clocks |
+| **Live news streams** | Up to six broadcast channels side by side, as rolling live streams |
+| **News feed** | Headlines from four wire sources under the panels |
+| **Portfolio tracking** | Allocation by asset class, risk metrics (beta, Sharpe, alpha), P&L, capital-gains tax estimate |
+| **Charting** | Base-100 performance with RSI, MACD and volume overlays |
+| **Backtesting** | Python MA-crossover engine — 18 statistics, equity curve, drawdown, full trade log |
+| **Price alerts** | Per-instrument thresholds over a WebSocket gateway |
 
 ---
 
@@ -61,22 +46,17 @@ surfaces the summary return — the full report view is in progress.
 
 The quickest way to judge any of it is to run it — and it runs with no backend at all.
 
-**Offline by default.** On launch the app probes for its API; if nothing answers, it
-falls back to a built-in demonstration mode: market data frozen from the real
-service, a fictional portfolio, and a real backtest result computed by the Python
-engine. The map, the charts and the backtest are all reachable; positions can be
-added and the allocation recomputes accordingly. Nothing is persisted, and a banner
-states as much.
+On launch the app probes for its API; if nothing answers, it drops into a built-in
+demonstration mode: frozen market data, a fictional portfolio, and a real backtest
+from the Python engine. Nothing is persisted, and a banner says so.
 
-Builds for **Windows** and **Android** are published under [Releases](../../releases/latest).
+Builds are published under [Releases](../../releases/latest):
 
-**Windows** — a standard PC (Intel / AMD) takes the `x64` installer, an ARM PC
-(Snapdragon, Surface Pro X) the `arm64` one. Neither is code-signed, so SmartScreen
-shows a *"Windows protected your PC"* screen on first run — click **More info** →
-**Run anyway**.
-
-**Android** — install the `.apk` directly. Distributed outside the Play Store, so
-Android asks you to allow the source once, then install.
+| Platform | File | First run |
+|---|---|---|
+| **Windows** — Intel / AMD | `x64` installer | SmartScreen → **More info** → **Run anyway** |
+| **Windows** — ARM (Snapdragon, Surface Pro X) | `arm64` installer | same |
+| **Android** | `.apk` | allow the source once, then install |
 
 ---
 
@@ -144,61 +124,38 @@ some of them:
 | **Updater excluded from the Android build** | `native-tls` uses the Windows cert store but drags in OpenSSL, which won't cross-compile for Android | A single cross-platform updater | Android checks GitHub Releases in-app instead of updating silently |
 | **Offline mode by intercepting one fetch chokepoint** | Every HTTP call already funnelled through a single function, so offline support cost one modified function instead of 26 mocked components | Per-component mocks | Frozen fixtures age with every market day, and WebSocket traffic bypasses the chokepoint |
 
-Three that took real debugging:
+Three problems that took real debugging:
 
-**MongoDB Atlas unreachable on a local network**
-
-**Symptom** — every connection failed with `querySrv ECONNREFUSED`.
-**Cause** — the network handed out a DNS server that Node's c-ares resolver could
-not query directly, so `mongodb+srv` never resolved.
-**Fix** — an optional `DNS_SERVERS` variable applied through `dns.setServers()`
-before bootstrap. Left unset in hosted environments, which keep normal DNS.
-
-**Memory exhaustion on a 512 MB host**
-
-**Symptom** — the container kept hitting its memory ceiling and restarting.
-**Cause** — the background market poller spawned a fresh pandas process every
-15 seconds; once Yahoo rate-limited the cloud IP, polls outlasted their interval
-and the processes stacked.
-**Fix** — a re-entrancy guard so only one poll runs at a time, a two-minute
-interval, and a `DISABLE_MARKET_POLLING` kill switch.
-
-**A shipped app that displayed nothing**
-
-**Symptom** — installing the released build led to a login form and no further.
-**Cause** — the backend URL is frozen into the bundle at build time and pointed at
-`localhost:3000`, the *visitor's* machine, where nothing listens. Sixteen of the
-eighteen routes sit behind that login gate.
-**Fix** — a startup probe against the API; when nothing answers, a demonstration
-layer serves 32 routes from fixtures captured off the real service, opens the gate
-with a demo session, and shows a banner stating that the data is frozen.
+- **MongoDB Atlas unreachable on a local network** — the LAN's DNS server couldn't
+  resolve `mongodb+srv` (`querySrv ECONNREFUSED`); fixed with a `DNS_SERVERS`
+  override applied before bootstrap.
+- **Memory exhaustion on a 512 MB host** — overlapping pandas polls stacked until
+  the container hit its ceiling and restarted; fixed with a re-entrancy guard, a
+  slower interval and a kill switch.
+- **A shipped app that displayed nothing** — the bundled backend URL pointed at the
+  visitor's own `localhost`, leaving them stuck at a login gate; fixed with a
+  startup probe that drops into offline mode.
 
 ---
 
 ## Roadmap
 
-In active development. What it doesn't do yet — and what's next.
+In active development.
 
 **Known limits**
 
-- **Authorisation is client-side only.** JWT sessions and TOTP multi-factor are
-  implemented, but no server-side guard enforces them — the API trusts its caller.
-  Acceptable while it listens on localhost; the first thing to fix before any
-  deployment.
-- **The backend is not hosted.** The client expects an API on localhost, or
-  falls back to offline mode.
-- **Two pages are scaffolding.** The screener and the strategy repository have
-  routes and headers, but no data view yet.
-- **The AI assistant and the in-app strategy editor are built but unrouted.**
+- Authorisation is client-side only — JWT + TOTP exist, but no server-side guard enforces them yet
+- The backend is not hosted — the client expects an API on localhost, or falls back to offline mode
+- The screener and strategy-repository pages are scaffolding — routes and headers, no data view
+- The AI assistant and in-app strategy editor are built but unrouted
 
 **Planned**
 
-- A screener view over the existing API, which already returns the rows
-- The full backtest report — the equity curve, drawdown and trade log are computed
-  and returned today, but nothing renders them
-- Thematic sector watch — the dial is in place, the feeds are not wired
-- Server-side authorisation
-- Broker integration for live orders — a goal, not started
+- [ ] Screener view over the existing API (which already returns the rows)
+- [ ] Full backtest report — equity curve, drawdown and trade log (computed, not yet rendered)
+- [ ] Thematic sector watch — the dial is in place, the feeds are not wired
+- [ ] Server-side authorisation
+- [ ] Broker integration for live orders
 
 ---
 
