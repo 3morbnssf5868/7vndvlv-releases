@@ -6,7 +6,7 @@
 
 From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
-[![Download](docs/download-button.svg)](../../releases/latest)
+[![Download — Windows 3.7 MB, Android 42 MB](docs/download-button.svg)](../../releases/latest)
 
 In development · **v0.1.3** · Windows · Android · Source private
 
