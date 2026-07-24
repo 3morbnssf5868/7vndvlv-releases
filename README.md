@@ -68,7 +68,7 @@ surfaces the summary return — the full report view is in progress.
 
 ## Try it
 
-Windows installers are published under [Releases](../../releases/latest).
+Builds for **Windows** and **Android** are published under [Releases](../../releases/latest).
 
 **It runs without a backend.** On launch the app probes for its API; if nothing
 answers, it falls back to a built-in demonstration mode: market data frozen from
@@ -77,11 +77,13 @@ Python engine. The map, the charts and the backtest are all reachable; positions
 can be added and the allocation recomputes accordingly. Nothing is persisted, and a
 banner states as much.
 
-Two things to know before downloading:
+**Windows** — a standard PC (Intel / AMD) takes the `x64` installer, an ARM PC
+(Snapdragon, Surface Pro X) the `arm64` one. Neither is code-signed, so SmartScreen
+shows a *"Windows protected your PC"* screen on first run — click **More info** →
+**Run anyway**.
 
-- Installers are provided for **x86-64** and **ARM64** Windows.
-- The installer carries no Windows code-signing certificate, so SmartScreen will
-  warn on first run.
+**Android** — install the `.apk` directly. Distributed outside the Play Store, so
+Android asks you to allow the source once, then install.
 
 ---
 
