@@ -6,9 +6,9 @@
 
 From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
-[![Download for Windows](docs/download-button.svg)](../../releases/latest)
+[![Download](docs/download-button.svg)](../../releases/latest)
 
-In development · **v0.1.3** · Windows · Source private
+In development · **v0.1.3** · Windows · Android · Source private
 
 [**Features**](#features) · [**Demo**](#try-it) · [**Architecture**](#architecture--c4-container-view) · [**Decisions**](#engineering-decisions) · [**Roadmap**](#status--limits)
 
