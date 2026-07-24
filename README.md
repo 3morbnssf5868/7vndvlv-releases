@@ -161,5 +161,3 @@ In active development.
 
 **The source code is private.** This repository hosts the installers, the update
 manifest and this write-up.
-
-**Author:** Omar Ben Youssef
