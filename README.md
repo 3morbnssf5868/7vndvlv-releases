@@ -60,7 +60,11 @@ The quickest way to judge any of it is to run it — and it runs with no backend
 
 On launch the app probes for its API; if nothing answers, it drops into a built-in
 demonstration mode: frozen market data and a fictional portfolio. Nothing is
-persisted, and a banner says so.
+persisted, and a banner says so. The screenshots above were taken in that mode.
+
+The packaged builds do point at a live API — a small VM reachable over HTTPS — so a
+fresh install talks to the real thing when it is up, and degrades to frozen data when
+it is not.
 
 Builds are published under [Releases](../../releases/latest):
 
@@ -191,7 +195,7 @@ In active development.
 **Known limits**
 
 - The backtest engine is unreachable from the interface — the report and the API call exist, the router and the button do not
-- The API is not publicly hosted — the client expects one on localhost, or falls back to offline mode
+- The API runs on a single small VM behind an HTTPS tunnel — no redundancy, no uptime guarantee; when it stops answering, clients fall back to frozen data
 - The screener reads a hard-coded list of 35 tickers; there is no universe scan behind it
 - Quotes carry yfinance's lag; the real-time Socket.IO gateway only feeds price alerts
 - No broker is connected — the **Paper** pill sends no orders; positions are held in the database
