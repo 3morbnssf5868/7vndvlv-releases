@@ -6,9 +6,9 @@
 
 From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
-[![Downloads — Windows and Android, v0.1.1](docs/download-button.svg)](../../releases/latest)
+[![Downloads — Windows and Android, v0.1.0](docs/download-button.svg)](../../releases/latest)
 
-In development · **v0.1.1** · Windows · Android · Source private
+In development · **v0.1.0** · Windows · Android · Source private
 
 [**Features**](#features) · [**Demo**](#demo) · [**Architecture**](#architecture) · [**Decisions**](#decisions) · [**Roadmap**](#roadmap)
 
@@ -16,8 +16,9 @@ In development · **v0.1.1** · Windows · Android · Source private
 
 ![The same screens on Windows and on a phone](docs/demo.webp)
 
-*Five screens of v0.1.1 in its offline demonstration mode — the Windows window on the
-left, the phone build on the right. The interface ships in French.*
+*Five screens in the offline demonstration mode — the Windows window on the left, the
+phone build on the right. The interface ships in French. The desktop is v0.1.0 as
+published; the phone's centre button landed in the commit after it.*
 
 > Built solo alongside a master's in finance, aiming for quantitative finance — the
 > whole stack from the React client to the Python quant engine, in roughly 80 commits
