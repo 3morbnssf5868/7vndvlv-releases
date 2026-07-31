@@ -8,20 +8,23 @@ From global markets and live news channels to a broker-connected portfolio, pric
 
 [![Download — Windows 3.7 MB, Android 42 MB](docs/download-button.svg)](../../releases/latest)
 
-In development · **v0.1.3** · Windows · Android · Source private
+In development · **v0.1.5** · Windows · Android · Source private
 
 [**Features**](#features) · [**Demo**](#demo) · [**Architecture**](#architecture) · [**Decisions**](#decisions) · [**Roadmap**](#roadmap)
 
 </div>
 
-![Demo](docs/demo.webp)
+![The same screens on Windows and on a phone](docs/demo.webp)
 
-*Five screens of v0.1.3 running in its offline demonstration mode.*
+*Five screens of v0.1.5 in its offline demonstration mode — the Windows window on the
+left, the phone build on the right. The interface ships in French.*
+
+> Releases currently carry **v0.1.0**. The 0.1.5 build shown above is not published yet.
 
 ---
 
 Built solo alongside a master's in finance, aiming for quantitative finance — the
-whole stack from the React client to the Python quant engine, in roughly 40 commits
+whole stack from the React client to the Python quant engine, in roughly 80 commits
 over June–July 2026.
 
 ---
@@ -32,13 +35,17 @@ Markets in, decisions out:
 
 |  |  |
 |---|---|
-| **Global market overview** | World map of exchanges, live indices by region, continental panels, clocks |
+| **Global market overview** | World map of exchanges, live indices by region, geopolitical risk band, continental panels, clocks |
+| **Screener** | 35 assets — stocks, ETFs and crypto — with sector, country, volume, market cap and distance from high |
 | **Live news streams** | Up to six broadcast channels side by side, as rolling live streams |
 | **News feed** | Headlines from four wire sources under the panels |
 | **Portfolio tracking** | Allocation by asset class, risk metrics (beta, Sharpe, alpha), P&L, capital-gains tax estimate |
 | **Charting** | Base-100 performance with RSI, MACD and volume overlays |
 | **Backtesting** | Python MA-crossover engine — 18 statistics, equity curve, drawdown, full trade log |
 | **Price alerts** | Per-instrument thresholds over a WebSocket gateway |
+
+The same React client ships to both targets. Three of the five screens above have a
+phone layout of their own; the rest are listed under [Roadmap](#roadmap).
 
 ---
 
@@ -57,6 +64,18 @@ Builds are published under [Releases](../../releases/latest):
 | **Windows** — Intel / AMD | `x64` installer | SmartScreen → **More info** → **Run anyway** |
 | **Windows** — ARM (Snapdragon, Surface Pro X) | `arm64` installer | same |
 | **Android** | `.apk` | allow the source once, then install |
+
+**What the shell dictates.** A packaged app is not a browser tab, and most of the
+work went into the difference:
+
+| | |
+|---|---|
+| Routing | through `#/` — a file loaded off disk has no server to rewrite URLs |
+| Fonts | self-hosted, carried in the bundle — no network call |
+| Native CSP | a host missing from `connect-src` is blocked **silently** in the package, never in dev |
+| Session | cookie **and** Bearer token — the Tauri webview has no usable cookie jar |
+| No backend | the app probes its API on launch; with no answer it drops to frozen data |
+| Updates | minisign-signed manifest on Windows; on Android, an in-app version check |
 
 ---
 
@@ -116,10 +135,11 @@ some of them:
 
 | Decision | Why | Alternative rejected | Trade-off accepted |
 |---|---|---|---|
-| **Tauri v2** for the desktop shell | Installers under 4 MB and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
+| **Tauri v2** for the shell | Installers under 4 MB and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
 | **One-shot Python processes** | Each request spawns a script and reads JSON off its stdout; pandas and yfinance never share state with the Node process | A long-lived Python service | 200–400 ms of interpreter startup on every request |
 | **Session in a cookie *and* a Bearer token** | The Tauri webview has no usable cookie jar — the cookie is dropped silently, with no error to catch | Cookie only | Two session paths to keep in sync, and a token reachable from JavaScript |
 | **Hash routing and self-hosted fonts** | The bundled app must render with no network at all | Browser routing + Google Fonts | A `#` in every URL, and font files carried in the bundle |
+| **No 3D globe on the phone** | MapLibre at 390 px drains the battery, and its gestures fight the scroll; mobile gets a flat, tappable map of the exchanges | One shared map component | Two map components to maintain instead of one |
 | **`native-tls` over `rustls`** | `rustls` pulls in `ring`, which needs a clang toolchain on Windows; SChannel already ships with the OS | `rustls` | TLS behaviour follows the host OS store instead of being identical everywhere |
 | **Updater excluded from the Android build** | `native-tls` uses the Windows cert store but drags in OpenSSL, which won't cross-compile for Android | A single cross-platform updater | Android checks GitHub Releases in-app instead of updating silently |
 | **Offline mode by intercepting one fetch chokepoint** | Every HTTP call already funnelled through a single function, so offline support cost one modified function instead of 26 mocked components | Per-component mocks | Frozen fixtures age with every market day, and WebSocket traffic bypasses the chokepoint |
@@ -144,14 +164,17 @@ In active development.
 
 **Known limits**
 
+- The API is not publicly hosted — the client expects one on localhost, or falls back to offline mode
+- Quotes carry yfinance's lag; the real-time Socket.IO gateway only feeds price alerts
+- No broker is connected — the **Paper** pill sends no orders; positions are held in the database
 - Authorisation is client-side only — JWT + TOTP exist, but no server-side guard enforces them yet
-- The backend is not hosted — the client expects an API on localhost, or falls back to offline mode
-- The screener and strategy-repository pages are scaffolding — routes and headers, no data view
+- Two screens have no phone layout — **Open positions** and **Strategies** keep their two-column
+  grid at 390 px, so the allocation donut covers the metric cards and the strategy list is crushed
 - The AI assistant and in-app strategy editor are built but unrouted
 
 **Planned**
 
-- [ ] Screener view over the existing API (which already returns the rows)
+- [ ] Phone layouts for the two remaining screens
 - [ ] Full backtest report — equity curve, drawdown and trade log (computed, not yet rendered)
 - [ ] Thematic sector watch — the dial is in place, the feeds are not wired
 - [ ] Server-side authorisation
