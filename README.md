@@ -6,9 +6,9 @@
 
 From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
 
-[![Download — Windows 3.7 MB, Android 42 MB](docs/download-button.svg)](../../releases/latest)
+[![Downloads — Windows and Android, v0.1.1](docs/download-button.svg)](../../releases/latest)
 
-In development · **v0.1.5** · Windows · Android · Source private
+In development · **v0.1.1** · Windows · Android · Source private
 
 [**Features**](#features) · [**Demo**](#demo) · [**Architecture**](#architecture) · [**Decisions**](#decisions) · [**Roadmap**](#roadmap)
 
@@ -16,36 +16,40 @@ In development · **v0.1.5** · Windows · Android · Source private
 
 ![The same screens on Windows and on a phone](docs/demo.webp)
 
-*Five screens of v0.1.5 in its offline demonstration mode — the Windows window on the
+*Five screens of v0.1.1 in its offline demonstration mode — the Windows window on the
 left, the phone build on the right. The interface ships in French.*
 
-> Releases currently carry **v0.1.0**. The 0.1.5 build shown above is not published yet.
-
----
-
-Built solo alongside a master's in finance, aiming for quantitative finance — the
-whole stack from the React client to the Python quant engine, in roughly 80 commits
-over June–July 2026.
+> Built solo alongside a master's in finance, aiming for quantitative finance — the
+> whole stack from the React client to the Python quant engine, in roughly 80 commits
+> over June–July 2026.
 
 ---
 
 ## Features
 
-Markets in, decisions out:
+What the app does today, on both targets:
 
 |  |  |
 |---|---|
 | **Global market overview** | World map of exchanges, live indices by region, geopolitical risk band, continental panels, clocks |
-| **Screener** | 35 assets — stocks, ETFs and crypto — with sector, country, volume, market cap and distance from high |
-| **Live news streams** | Up to six broadcast channels side by side, as rolling live streams |
+| **Screener** | A fixed watchlist — 35 tickers across stocks, ETFs and crypto — sortable by change, market cap and distance from high, filterable by class. It reads a hard-coded list, not a universe scan; widening it is on the [roadmap](#roadmap) |
+| **Live news streams** | Ten broadcast channels, up to six on screen at once, as rolling live streams |
 | **News feed** | Headlines from four wire sources under the panels |
 | **Portfolio tracking** | Allocation by asset class, risk metrics (beta, Sharpe, alpha), P&L, capital-gains tax estimate |
 | **Charting** | Base-100 performance with RSI, MACD and volume overlays |
-| **Backtesting** | Python MA-crossover engine — 18 statistics, equity curve, drawdown, full trade log |
-| **Price alerts** | Per-instrument thresholds over a WebSocket gateway |
+| **Price alerts** | Per-instrument thresholds, pushed over a Socket.IO gateway |
+
+**Built, working, and not reachable from the interface.** The Python backtest engine
+runs and returns eighteen statistics, `POST /api/algo/backtest` serves them, and a
+React report renders the equity curve, the drawdown and the full trade log. What is
+missing is the last link: the two components that call it — `AlgoDashboard` and a
+strategy panel — are not wired into the router, and the Strategies screen you can
+reach shows a static mock whose **Backtest** button has no handler. Same story for
+the AI assistant and the in-app code editor. It is written, it is tested by hand, and
+no click in the shipped app starts it.
 
 The same React client ships to both targets. Three of the five screens above have a
-phone layout of their own; the rest are listed under [Roadmap](#roadmap).
+phone layout of their own; the other two are listed under [Roadmap](#roadmap).
 
 ---
 
@@ -54,8 +58,8 @@ phone layout of their own; the rest are listed under [Roadmap](#roadmap).
 The quickest way to judge any of it is to run it — and it runs with no backend at all.
 
 On launch the app probes for its API; if nothing answers, it drops into a built-in
-demonstration mode: frozen market data, a fictional portfolio, and a real backtest
-from the Python engine. Nothing is persisted, and a banner says so.
+demonstration mode: frozen market data and a fictional portfolio. Nothing is
+persisted, and a banner says so.
 
 Builds are published under [Releases](../../releases/latest):
 
@@ -81,37 +85,58 @@ work went into the difference:
 
 ## Architecture
 
-Four moving parts, at the C4 container level:
+One React client, two packaged targets, one API, and a Python process that is born
+and dies with each request.
 
 ```mermaid
 flowchart TB
-    subgraph client["Client — Tauri v2 · Windows & Android"]
-        ui["React 18 + TypeScript<br/>ECharts · MapLibre GL"]
+    subgraph client["Client — one React 18 + TypeScript codebase"]
+        ui["UI · ECharts · MapLibre GL<br/>hash routing · offline fallback"]
+        win["Tauri v2 → Windows<br/>NSIS · MSI · minisign updater"]
+        droid["Tauri v2 → Android<br/>APK · in-app version check"]
+        ui --- win
+        ui --- droid
     end
 
     subgraph api["API — NestJS"]
-        rest["REST API<br/>11 modules"]
-        ws["Socket.IO gateways<br/>market ticks · alert notifications"]
+        rest["REST — 12 modules"]
+        ws["Socket.IO — 2 gateways<br/>market ticks · price alerts"]
     end
 
-    db[("MongoDB<br/>Mongoose")]
-    py["Python — one-shot process<br/>yfinance · pandas · backtest engine"]
+    db[("MongoDB Atlas<br/>Mongoose schemas")]
+    py["Python — one process per request<br/>yfinance · pandas · backtest engine"]
+    yf(["Yahoo Finance"])
 
-    ui -->|HTTP| rest
+    ui -->|HTTPS| rest
     ui <-->|WebSocket| ws
-    api --> db
+    rest --> db
+    ws --> db
     rest -->|spawn, JSON on stdout| py
+    py -->|quotes, history| yf
 ```
 
-The API exposes eleven modules — `health`, `auth`, `market`, `portfolio`,
-`cashflow`, `price-alerts`, `strategies`, `algo`, `news`, `ai`, `changelog` — plus
-two Socket.IO gateways, one for market ticks and one for alert notifications.
+**The API.** Twelve REST modules — `health`, `auth`, `market`, `portfolio`,
+`cashflow`, `price-alerts`, `strategies`, `algo`, `news`, `ai`, `changelog`,
+`countries` — plus two Socket.IO gateways, one pushing market ticks and one pushing
+alert notifications. Auth is JWT with bcrypt and TOTP multi-factor; the guard is
+still client-side, which is the honest limit listed under [Roadmap](#roadmap).
 
-**The Python bridge.** NestJS keeps no long-running Python process. Each request
-that needs market data or a backtest spawns a script, reads JSON off its stdout and
-parses it; the process then exits. No queue, no broker, no shared state. The cost
-is roughly 200–400 ms of interpreter startup per request; the benefit is that a
-script that hangs or crashes can never poison the API.
+**The Python bridge.** NestJS keeps no long-running Python process. Each request that
+needs market data or a backtest spawns a script, reads JSON off its stdout and parses
+it; the process then exits. No queue, no broker, no shared state. The cost is roughly
+200–400 ms of interpreter startup per request; the benefit is that a script that hangs
+or crashes can never poison the API — and pandas never shares a heap with Node.
+
+**The client.** One codebase, two shells. The same React build is wrapped by Tauri v2
+for Windows and for Android, so a layout fix lands on both at once — and so does a
+regression. What differs is deliberately small: the desktop carries a signed updater
+the Android build cannot compile, and the phone swaps the MapLibre globe for a flat
+map. Everything else, including the offline fallback, is shared code.
+
+**Data on disk.** MongoDB Atlas holds users, portfolios, cash flows, strategies and
+alert thresholds. Market data is never stored — it is fetched per request, cached in
+memory for 30 seconds to 10 minutes depending on how fast the figure moves, and
+dropped.
 
 **The stack.**
 
@@ -120,7 +145,7 @@ script that hangs or crashes can never poison the API.
 | Shell | Tauri v2 (Rust) — Windows (NSIS/MSI) and Android (APK); minisign-signed desktop updater |
 | Frontend | React 18 + TypeScript, Vite, ECharts, MapLibre GL |
 | Real-time | Socket.IO — two gateways |
-| Backend | NestJS — 11 REST modules |
+| Backend | NestJS — 12 REST modules |
 | Auth | JWT, bcrypt, TOTP multi-factor (otplib, qrcode) |
 | Database | MongoDB Atlas, Mongoose schemas |
 | Quant / data | Python — yfinance, pandas, moving-average backtest engine |
@@ -164,7 +189,9 @@ In active development.
 
 **Known limits**
 
+- The backtest engine is unreachable from the interface — the report and the API call exist, the router and the button do not
 - The API is not publicly hosted — the client expects one on localhost, or falls back to offline mode
+- The screener reads a hard-coded list of 35 tickers; there is no universe scan behind it
 - Quotes carry yfinance's lag; the real-time Socket.IO gateway only feeds price alerts
 - No broker is connected — the **Paper** pill sends no orders; positions are held in the database
 - Authorisation is client-side only — JWT + TOTP exist, but no server-side guard enforces them yet
@@ -174,8 +201,9 @@ In active development.
 
 **Planned**
 
+- [ ] Route the backtest report and make the Strategies screen drive the engine
+- [ ] A real screener universe instead of a fixed watchlist
 - [ ] Phone layouts for the two remaining screens
-- [ ] Full backtest report — equity curve, drawdown and trade log (computed, not yet rendered)
 - [ ] Thematic sector watch — the dial is in place, the feeds are not wired
 - [ ] Server-side authorisation
 - [ ] Broker integration for live orders
