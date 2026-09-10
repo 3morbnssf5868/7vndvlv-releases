@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="304" height="74" viewBox="0 0 304 74" role="img" aria-label="Downloads — Windows and Android, v0.1.0">
+  <title>Downloads — Windows and Android · v0.1.0</title>
+
+  <!-- Aplats seuls : pas de dégradé, pas de reflet, pas d'ombre.
+       Le fond reprend celui des panneaux de l'app en thème sombre. -->
+  <rect x="1" y="1" width="302" height="72" rx="14" fill="#0a1120"/>
+  <rect x="1.5" y="1.5" width="301" height="71" rx="13.5" fill="none" stroke="#24354f" stroke-width="1.4"/>
+
+  <!-- Colonne d'icône, détachée par un filet vertical -->
+  <g transform="translate(30,25)" stroke="#1d8cf8" stroke-width="2.2" fill="none"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 0 v14"/>
+    <path d="M4.5 8.5 l6.5 6.5 6.5-6.5"/>
+    <path d="M0 22 h22"/>
+  </g>
+  <rect x="76" y="17" width="1" height="40" fill="#24354f"/>
+
+  <text x="96" y="34" fill="#e8edf7" font-size="18" font-weight="600" letter-spacing="0.2"
+        font-family="'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif">Downloads</text>
+  <text x="96" y="53" fill="#8fa8cc" font-size="12" font-weight="500" letter-spacing="0.55"
+        font-family="ui-monospace,'SF Mono','Cascadia Mono',Consolas,monospace">WINDOWS · ANDROID</text>
+
+  <!-- Pastille de version, alignée à droite -->
+  <rect x="228" y="26" width="54" height="22" rx="11" fill="none" stroke="#1d8cf8" stroke-opacity="0.5"/>
+  <text x="255" y="41" fill="#1d8cf8" font-size="11.5" font-weight="600" text-anchor="middle" letter-spacing="0.3"
+        font-family="ui-monospace,'SF Mono','Cascadia Mono',Consolas,monospace">v0.1.0</text>
+</svg>
