@@ -2,10 +2,10 @@
 
 # 7vndvlv
 
-**One workspace for the entire investing loop.**
+**A platform for trading with code.**
 
-Global markets, live news, an order desk, price alerts — and a bench to backtest
-and compare systematic strategies, including Python you write yourself.
+Write a Python strategy, run it through a sandboxed backtest engine and
+send it to a real execution desk.
 
 [![Downloads — Windows and Android, v0.1.0](docs/download-button.svg)](../../releases/latest)
 
@@ -15,9 +15,9 @@ In development · **v0.1.0** · Windows · Android · Source private
 
 ![7vndvlv on desktop and on a phone, side by side](docs/hero.webp)
 
-*One React client, two shells — the global overview on Windows, the portfolio
-and manager's desk on the phone, in the offline demonstration mode. Built solo
-alongside a master's in finance, since June 2026.*
+*One React client, two shells — the portfolio on Windows and on a phone, in
+the offline demonstration mode. Built solo alongside a master's in finance,
+since June 2026.*
 
 ---
 
