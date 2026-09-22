@@ -13,14 +13,11 @@ In development · **v0.1.0** · Windows · Android · Source private
 
 </div>
 
-![7vndvlv on Windows and on a phone](docs/hero.webp)
+![7vndvlv on desktop and on a phone, side by side](docs/hero.webp)
 
-> Built solo alongside a master's in finance, aiming for quantitative finance —
-> the whole stack, from the React client to the Python quant engine, the container
-> it runs strategies in and the bridge to a broker, since June 2026.
-
-*The interface ships in French. The screenshot above is from the current build, in
-the offline demonstration mode; the published installer is v0.1.0.*
+*One React client, two shells — the global overview on Windows, the portfolio
+and manager's desk on the phone, in the offline demonstration mode. Built solo
+alongside a master's in finance, since June 2026.*
 
 ---
 
@@ -36,8 +33,9 @@ the offline demonstration mode; the published installer is v0.1.0.*
 | **Price alerts** | Per-instrument thresholds, pushed over Socket.IO |
 | **Strategy bench** | Three engines behind one screen — moving-average crossover, cross-sectional dual momentum, and **Python you write yourself**, sandboxed in a throwaway Docker container |
 
-**It runs with no backend at all** — on launch the app probes its API, and drops
-into an offline demo with frozen data if nothing answers.
+A user-written strategy reproduces the built-in engine to the cent — the same
+execution loop runs both. Tested against six real attacks; see
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -51,11 +49,8 @@ into an offline demo with frozen data if nothing answers.
 
 Builds are published under [Releases](../../releases/latest).
 
----
+**[Full architecture →](docs/ARCHITECTURE.md)** — the request-path diagram,
+the complete decisions table, and the stack.
 
-**[Read the architecture →](docs/ARCHITECTURE.md)** — the request path, the
-sandbox tested against six attacks, and the decisions behind them, with the
-trade-off each one accepted.
-
-**The source code is private.** This repository hosts the installers, the update
-manifest and this write-up.
+**The source code is private.** This repository hosts the installers, the
+update manifest and this write-up.
