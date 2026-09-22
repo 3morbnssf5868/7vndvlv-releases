@@ -4,7 +4,7 @@
 
 **The goal: one workspace for the entire investing loop.**
 
-From global markets and live news channels to a broker-connected portfolio, price alerts and a bench to backtest and compare systematic strategies.
+From global markets and live news channels to an order desk, price alerts and a bench to backtest and compare systematic strategies.
 
 [![Downloads — Windows and Android, v0.1.0](docs/download-button.svg)](../../releases/latest)
 
@@ -21,25 +21,27 @@ demonstration mode. The interface ships in French. The screenshots come from the
 current build; the installer published under Releases is v0.1.0.*
 
 > Built solo alongside a master's in finance, aiming for quantitative finance — the
-> whole stack, from the React client to the Python quant engine and the container it
-> runs strategies in, since June 2026.
+> whole stack, from the React client to the Python quant engine, the container it
+> runs strategies in and the bridge to a broker, since June 2026.
 
 ---
 
 ## Features
 
-What the app does today, on both targets:
+What the app does today:
 
 |  |  |
 |---|---|
-| **Global market overview** | World map of exchanges, live indices by region, geopolitical risk band, continental panels, clocks |
-| **Screener** | A fixed watchlist — 35 tickers across stocks, ETFs and crypto — sortable by change, market cap and distance from high, filterable by class. It reads a hard-coded list, not a universe scan; widening it is on the [roadmap](#roadmap) |
+| **Global market overview** | World map of exchanges, live indices by region, geopolitical risk band, continental panels, clocks — and a fold-out markets banner with what is moving |
+| **Execution desk** | What you hold on the left, the order ticket in the centre, the order feed on the right, mandates underneath. Market or limit, day or good-till-cancelled. Orders fill on a local simulator; balances are read from an Interactive Brokers paper account |
 | **Live news streams** | Ten broadcast channels, up to six on screen at once, as rolling live streams |
 | **News feed** | Headlines from four wire sources under the panels |
+| **Newsletters** | A private inbox per account for the newsletters you subscribe to, with a morning digest written by Claude |
 | **Portfolio tracking** | Allocation by asset class, risk metrics (beta, Sharpe, alpha), P&L, capital-gains tax estimate |
 | **Charting** | Base-100 performance with RSI, MACD and volume overlays |
 | **Price alerts** | Per-instrument thresholds, pushed over a Socket.IO gateway |
 | **Strategy bench** | Three engines behind one screen: a moving-average crossover on a single asset, a cross-sectional dual-momentum portfolio, and **Python you write yourself** — see below |
+| **Strategy terminal** | A terminal that slides up over any page: script files, an editor, a run column and the repository of saved strategies side by side. A file runs in the same sandbox as the bench |
 
 **Write a strategy, get the same report as the built-in engines.** A user-written
 Python class produces the eighteen statistics, the equity curve, the drawdown and the
@@ -58,6 +60,11 @@ managing one.
 The public demo has no backend at all, so there the **Run** button returns a frozen
 result from a real run and says so on screen, in an amber banner rather than in
 silence.
+
+**Saving a strategy runs it again.** The save goes through the same queue as a run,
+and what is stored is the server's result — never the figures on screen. A strategy
+that crashes is refused, and nothing is written. The save also sends the code that
+*ran*, not the code in the editor: a warning appears when the two have drifted apart.
 
 The contract is deliberately poor: `on_bar(ctx)` returns a *state* — `LONG`, `FLAT`
 or `None` — never an order. The fill price is decided by the execution loop at the
@@ -81,9 +88,19 @@ time limit delivered as a `SIGKILL` from *outside* the Python process — a time
 watched code can catch is not a timeout. Six attacks were run against it and are
 listed under [Decisions](#decisions).
 
-The same React client ships to both targets. The first four screens below each have a
-phone layout of their own; the strategy bench and Open positions do not — they keep
-their desktop grid at 390 px, which is listed under [Roadmap](#roadmap).
+**A desk that says what is simulated.** The execution desk shows two facts side by
+side, on purpose: the orders are simulated, and the balances are real figures read
+from the broker. Without that banner, the gap between the two would read as a bug. An
+unknown figure is shown as a dash, never as a zero — a zero would claim the account is
+empty — and amounts stay in their own currency, never converted and never added
+across currencies.
+
+**One client, two roles.** The same React client ships to both targets, but the phone
+is not a shrunken desktop. It is a companion: its bar carries the execution desk and
+the portfolio, and a sheet in the middle holds a cockpit — portfolio value, the day's
+P&L, the session curve, the New York, Paris and Tokyo exchanges, and the alerts that
+are armed. The screens built around the globe, the bench and the terminal are
+designed for a large screen.
 
 ### The screens
 
@@ -92,26 +109,32 @@ their desktop grid at 390 px, which is listed under [Roadmap](#roadmap).
 **Global overview** — exchanges on a world map, live indices by region, and the
 strategy and portfolio rails either side of the globe.
 
-![Screener](docs/screen-screener.webp)
+![Execution desk](docs/screen-live.webp)
 
-**Screener** — a fixed watchlist of 35 tickers — stocks, ETFs and crypto —
-sortable by change, market cap and distance from high.
+**Execution desk** — holdings, ticket and order feed in three columns, mandates
+underneath, and the banner that separates simulated orders from balances read at
+the broker.
 
 ![Portfolio](docs/screen-portfolio.webp)
 
 **Portfolio** — base-100 performance over a year, with the manager's book
 underneath: weights, value and running P&L, line by line.
 
-![Markets and alerts](docs/screen-markets.webp)
+![Markets banner and alerts](docs/screen-markets.webp)
 
-**Markets & alerts** — FX, equities, commodities, bonds and crypto by asset
-class, beside the price alerts armed over the Socket.IO gateway.
+**Markets banner & alerts** — FX, equities, commodities, bonds and crypto by asset
+class, folded out of the overview, beside the price alerts armed over Socket.IO.
 
 ![Strategy bench — writing a strategy in Python](docs/screen-code.webp)
 
 **Strategy bench** — the third tab is an editor. The class shown is the worked
 example, and it is the one that pins the engine down: its result matches the
 built-in moving-average engine to the cent.
+
+![Strategy terminal](docs/screen-terminal.webp)
+
+**Strategy terminal** — script files, the editor, and a right-hand column with the
+run controls, the last result and the saved strategies.
 
 ---
 
@@ -125,7 +148,10 @@ persisted, and a banner says so. The screenshots above were taken in that mode.
 
 The packaged builds do point at a live API — a small VM reachable over HTTPS — so a
 fresh install talks to the real thing when it is up, and degrades to frozen data when
-it is not.
+it is not. The demo account's credentials are printed in the client, so anyone can use
+them; the API therefore treats that account as read-only. It can read everything and
+write nothing — backtests and AI calls included, since they cost CPU time or a paid
+request.
 
 Builds are published under [Releases](../../releases/latest):
 
@@ -152,8 +178,9 @@ work went into the difference:
 ## Architecture
 
 One React client, two packaged targets, one API, a Python process that is born and
-dies with each request — and, for code the app did not write, a container that is
-born and dies with it.
+dies with each request — and two exceptions: a container that is born and dies with
+code the app did not write, and one Python process that stays up, because a broker
+answers when it wants to.
 
 ```mermaid
 flowchart TB
@@ -166,8 +193,10 @@ flowchart TB
     end
 
     subgraph api["API — NestJS"]
+        guard["Global guard<br/>closed by default · read-only demo role"]
         rest["REST — 16 modules"]
-        ws["Socket.IO — 2 gateways<br/>market ticks · price alerts"]
+        ws["Socket.IO — 4 gateways<br/>ticks · alerts · orders · newsletters"]
+        guard --> rest
     end
 
     db[("MongoDB Atlas<br/>Mongoose schemas")]
@@ -175,9 +204,11 @@ flowchart TB
     cache[("Parquet cache<br/>one file per ticker<br/>full history")]
     box["Docker sandbox<br/>no network · read-only fs<br/>512 MB · external SIGKILL"]
     q[("Redis — BullMQ<br/>one run at a time")]
+    bridge["IBKR bridge — one long-lived<br/>Python process · read-only<br/>unless armed"]
+    tws(["Interactive Brokers TWS<br/>paper account"])
     yf(["Yahoo Finance"])
 
-    ui -->|HTTPS| rest
+    ui -->|HTTPS| guard
     ui <-->|WebSocket| ws
     rest --> db
     ws --> db
@@ -188,30 +219,51 @@ flowchart TB
     cache -.->|refresh, out of band| yf
     py -->|user-written strategy| box
     box -->|read-only mount| cache
+    rest <-->|JSON lines over stdio| bridge
+    bridge <--> tws
 ```
 
 **The API.** Sixteen REST modules — `health`, `auth`, `market`, `portfolio`,
 `cashflow`, `price-alerts`, `strategies`, `algo`, `news`, `newsletters`, `ai`,
-`search`, `translate`, `changelog`, `countries`, `orders` — plus two Socket.IO
-gateways, one pushing market ticks and one pushing alert notifications. Auth is JWT
-with bcrypt and TOTP multi-factor; the guard is still client-side, which is the
-honest limit listed under [Roadmap](#roadmap).
+`search`, `translate`, `changelog`, `countries`, `orders` — plus four Socket.IO
+gateways: market ticks for everyone, and alert notifications, order status and
+newsletter counts to each user's own room. Auth is JWT with bcrypt and TOTP
+multi-factor.
 
-**The Python bridge.** NestJS keeps no long-running Python process. Each request that
-needs market data or a backtest spawns a script, reads JSON off its stdout and parses
-it; the process then exits. No queue, no broker, no shared state. The cost is roughly
+**Authorisation is closed by default.** A global guard refuses every route that is
+not explicitly marked public — only what must work before signing in, such as the
+health probe and the login itself — and that includes the routes written tomorrow.
+The token proves who you are, but not whether your account still exists or what it
+may do today: the session is re-read from the database, behind a 30-second cache, so
+a deleted account loses access at once instead of keeping it until its token expires.
+Two more guards run after it — the read-only demo account, then roles.
+
+**The Python bridge.** For market data and backtests, NestJS keeps no long-running
+Python process. Each request spawns a script, reads JSON off its stdout and parses it;
+the process then exits, and nothing is shared between two runs. The cost is roughly
 200–400 ms of interpreter startup per request; the benefit is that a script that hangs
 or crashes can never poison the API — and pandas never shares a heap with Node.
 
+**The broker bridge — the one exception.** An order sent at 10:02 can be filled at
+10:47, and a script that has already exited cannot hear it. The Interactive Brokers
+bridge is therefore the only permanent Python process in the system: JSON lines over
+stdin and stdout, supervised by NestJS, restarted after a crash with a back-off that
+grows from 2 seconds to 60. It is off unless switched on. And it never retries a
+refusal: pointed at a live port or at a non-paper account, it stops for good until
+someone changes the configuration — waiting two seconds would only produce the same
+no, forever.
+
 **The client.** One codebase, two shells. The same React build is wrapped by Tauri v2
 for Windows and for Android, so a layout fix lands on both at once — and so does a
-regression. What differs is deliberately small: the desktop carries a signed updater
-the Android build cannot compile, and the phone swaps the MapLibre globe for a flat
-map. Everything else, including the offline fallback, is shared code.
+regression. What differs is deliberate: the desktop carries a signed updater the
+Android build cannot compile, and the phone gets its own navigation — a companion
+rather than a workstation. Everything else, including the offline fallback, is
+shared code.
 
-**Data on disk.** MongoDB Atlas holds users, portfolios, cash flows, strategies and
-alert thresholds. Quotes stay ephemeral — fetched per request, held in memory for 30
-seconds to 10 minutes depending on how fast the figure moves, then dropped.
+**Data on disk.** MongoDB Atlas holds users, portfolios, cash flows, strategies,
+orders, mandates and alert thresholds. Quotes stay ephemeral — fetched per request,
+held in memory for 30 seconds to 10 minutes depending on how fast the figure moves,
+then dropped.
 
 Historical bars are the exception, and the reason is not speed. Yahoo re-adjusts past
 prices **retroactively** every time a dividend is paid, so the same backtest run three
@@ -227,13 +279,14 @@ It is also what lets a sandboxed strategy run with no network at all.
 |---|---|
 | Shell | Tauri v2 (Rust) — Windows (NSIS/MSI) and Android (APK); minisign-signed desktop updater |
 | Frontend | React 18 + TypeScript, Vite, ECharts, MapLibre GL |
-| Real-time | Socket.IO — two gateways |
+| Real-time | Socket.IO — four gateways |
 | Backend | NestJS — 16 REST modules |
-| Auth | JWT, bcrypt, TOTP multi-factor (otplib, qrcode) |
+| Auth | JWT, bcrypt, TOTP multi-factor (otplib, qrcode); a global guard, closed by default, with a read-only demo role and roles |
 | Database | MongoDB Atlas, Mongoose schemas |
 | Quant / data | Python — pandas, numpy, pyarrow; Parquet cache; three backtest engines sharing one execution loop |
 | Sandbox | Docker — user strategies run with no network, a read-only filesystem, capped memory and an external `SIGKILL` |
 | Queue | BullMQ on Redis, concurrency 1 — the API degrades to direct execution when Redis is absent |
+| Broker | Interactive Brokers through TWS (ib_insync), behind a venue interface; a local simulator by default |
 | Packaging | The API runs under systemd on its host — it has to *start* containers, so it is not in one. Docker is reserved for the sandbox image |
 
 ---
@@ -245,11 +298,12 @@ some of them:
 
 | Decision | Why | Alternative rejected | Trade-off accepted |
 |---|---|---|---|
-| **Tauri v2** for the shell | Installers under 4 MB and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
+| **Tauri v2** for the shell | Installers around 5 MB and a minisign-signed update manifest, against roughly 150 MB for a Chromium-based shell | Electron | A Rust toolchain in the build chain, and one build per target architecture |
 | **One-shot Python processes** | Each request spawns a script and reads JSON off its stdout; pandas and yfinance never share state with the Node process | A long-lived Python service | 200–400 ms of interpreter startup on every request |
 | **Session in a cookie *and* a Bearer token** | The Tauri webview has no usable cookie jar — the cookie is dropped silently, with no error to catch | Cookie only | Two session paths to keep in sync, and a token reachable from JavaScript |
+| **Authorisation closed by default** | The previous default — open unless a controller remembered to check — had left most modules reachable without a session, and nobody had decided that | A check written in each controller | Every public route has to be marked; a forgotten mark shows up as a 401 rather than as a leak |
 | **Hash routing and self-hosted fonts** | The bundled app must render with no network at all | Browser routing + Google Fonts | A `#` in every URL, and font files carried in the bundle |
-| **No 3D globe on the phone** | MapLibre at 390 px drains the battery, and its gestures fight the scroll; mobile gets a flat, tappable map of the exchanges | One shared map component | Two map components to maintain instead of one |
+| **The phone is a companion, not a small desktop** | On a phone you watch, get alerted and check; you do not write strategies. Its bar carries the desk and the portfolio, and the globe stays on the desktop | The same screens, squeezed to 390 px | Some screens are reachable only from a desktop |
 | **`native-tls` over `rustls`** | `rustls` pulls in `ring`, which needs a clang toolchain on Windows; SChannel already ships with the OS | `rustls` | TLS behaviour follows the host OS store instead of being identical everywhere |
 | **Updater excluded from the Android build** | `native-tls` uses the Windows cert store but drags in OpenSSL, which won't cross-compile for Android | A single cross-platform updater | Android checks GitHub Releases in-app instead of updating silently |
 | **Offline mode by intercepting one fetch chokepoint** | Every HTTP call already funnelled through a single function, so offline support cost one modified function instead of 26 mocked components | Per-component mocks | Frozen fixtures age with every market day, and WebSocket traffic bypasses the chokepoint |
@@ -257,6 +311,9 @@ some of them:
 | **Strategies return a state, never an order** | `on_bar` yields `LONG`/`FLAT`/`None`, and the execution loop decides the fill at the next open. The strategy never sees the price it gets, so look-ahead is structurally impossible instead of merely discouraged | An order-based API, as most backtest libraries offer | No intrabar logic, no limit orders, no position sizing from inside the strategy |
 | **Historical bars cached as Parquet, one file per ticker** | Yahoo re-adjusts past prices retroactively on every dividend; without a frozen copy the same backtest does not reproduce itself | Fetching per request, as the quotes still do | The cache has to be refreshed out of band, and a delisted ticker never enters it — survivorship bias is not solved, only made visible |
 | **Strategy runs are queued, one at a time** | A run holds 512 MB for nine seconds on a 956 MB host. Two at once was measured: **17.4 s each**, against **7.1 s and 5.7 s** when serialised. Processes fighting for memory lose more than they would have lost waiting | Running them concurrently and hoping | A second user waits for the first, and a parameter sweep is serial |
+| **Saved figures come from the server** | Saving a strategy re-runs its code through the queue; the stored result is the server's, so a figure on screen can never be passed off as a measurement | Storing the client's last run | A save costs a full run, about nine seconds |
+| **Orders go through a venue interface, simulated by default** | The whole chain — ticket, feed, order lifecycle, socket — was written and shown before a broker was connected. The simulator acknowledges asynchronously and leaves an unreachable limit working, because an instant "filled" is an interface no real broker could honour | Calling the broker straight from the service | The simulator invents no slippage, fees or order book — its fills are not measurements, and it says so |
+| **Three separate switches before an order reaches IBKR** | Start the bridge, allow it to transmit (otherwise TWS itself holds the session read-only), make it the venue — and, above all three, a refusal of any non-paper account. "Is TWS answering?", "may it transmit?" and "should my orders really go?" are three different questions | A single on/off flag | Four environment variables to get right before anything moves |
 
 **The sandbox, tested rather than asserted.** Six attacks, run on an amd64 VM:
 
@@ -293,26 +350,22 @@ In active development.
 - A run costs about nine seconds, nearly all of it container start-up. Fine for writing a strategy; the cost is paid per run and nothing amortises it yet
 - The cache has to be refreshed by hand; a ticker missing from it fails the run rather than falling back to the network, which is deliberate but unattended
 - The API runs on a single small VM behind an HTTPS tunnel — no redundancy, no uptime guarantee; when it stops answering, clients fall back to frozen data
-- The screener reads a hard-coded list of 35 tickers; there is no universe scan behind it
-- Quotes carry yfinance's lag; the real-time Socket.IO gateway only feeds price alerts
-- No broker is connected — the **Paper** pill sends no orders; positions are held in the database
-- Authorisation is client-side only — JWT + TOTP exist, but no server-side guard enforces them yet
-- Two screens have no phone layout — **Open positions** and **Strategies** keep their two-column
-  grid at 390 px, so the allocation donut covers the metric cards and the strategy list is crushed
-- The AI assistant is built but unrouted
+- Quotes carry yfinance's delay; nothing in the stack is a real-time exchange feed
+- Orders fill on the local simulator. The route to IBKR is written end to end, but so far the bridge has only read the paper account's balances
+- The order book still assumes USD while the paper account's base currency is CHF — amounts are never converted, so they sit side by side instead of being added up
+- Script files in the terminal live in the browser's storage until they are saved as a strategy
+- The strategies page keeps its desktop grid on a phone
+- The chat assistant is built, but nothing in the interface calls it
 - Strategies are single-asset: `on_bar` returns one state for one ticker, so a user-written
   portfolio is not expressible yet
 
 **Planned**
 
-- [ ] Persist a written strategy, not just a browser-local draft
 - [ ] Parameter sweeps — the queue makes them possible, the interface does not offer them yet
 - [ ] Target weights instead of a single state, for multi-asset strategies
-- [ ] A real screener universe instead of a fixed watchlist
-- [ ] Phone layouts for the two remaining screens
+- [ ] Orders transmitted to IBKR — the paper account first, a live account after
+- [ ] Alerts and the morning digest delivered while the app is closed
 - [ ] Thematic sector watch — the dial is in place, the feeds are not wired
-- [ ] Server-side authorisation
-- [ ] Broker integration for live orders
 
 ---
 
