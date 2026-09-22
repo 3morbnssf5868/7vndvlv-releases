@@ -38,11 +38,11 @@ execution loop runs both. Tested against six real attacks; see
 
 | Platform | File | First run |
 |---|---|---|
-| **Windows** — Intel / AMD | `x64` installer | SmartScreen → **More info** → **Run anyway** |
-| **Windows** — ARM (Snapdragon, Surface Pro X) | `arm64` installer | same |
-| **Android** | `.apk` | allow the source once, then install |
+| **Windows** — Intel / AMD | [`x64` installer](../../releases/download/v0.1.0/7vndvlv_0.1.0_x64-setup.exe) | SmartScreen → **More info** → **Run anyway** |
+| **Windows** — ARM (Snapdragon, Surface Pro X) | [`arm64` installer](../../releases/download/v0.1.0/7vndvlv_0.1.0_arm64-setup.exe) | same |
+| **Android** | [`.apk`](../../releases/download/v0.1.0/7vndvlv_0.1.0_android.apk) | allow the source once, then install |
 
-Builds are published under [Releases](../../releases/latest).
+All builds, past versions and the update manifest live under [Releases](../../releases/latest).
 
 ---
 
