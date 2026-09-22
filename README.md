@@ -24,15 +24,9 @@ shown here, in the offline demonstration mode.*
 
 |  |  |
 |---|---|
-| **Global market overview** | World map of exchanges, live indices by region, geopolitical risk band, clocks, fold-out markets banner |
-| **Execution desk** | Holdings, order ticket and order feed. Orders fill on a local simulator; balances are read from an Interactive Brokers paper account |
-| **Portfolio tracking** | Allocation by asset class, beta, Sharpe, alpha, P&L, capital-gains tax estimate |
-| **Charting** | Base-100 performance with RSI, MACD and volume overlays |
+| **Portfolio & execution** | Holdings, order ticket and order feed — orders fill on a local simulator, balances read from an Interactive Brokers paper account. Base-100 performance charted with RSI, MACD and volume overlays |
+| **Strategy engine** | Three engines behind one screen — moving-average crossover, cross-sectional dual momentum, and **Python you write yourself**, sandboxed in a throwaway Docker container, from a terminal that slides over any page |
 | **Live news** | Ten broadcast channels, plus headlines from four wire sources |
-| **Newsletters** | A private inbox per account, with a morning digest written by Claude |
-| **Price alerts** | Per-instrument thresholds, pushed over Socket.IO |
-| **Strategy bench** | Three engines behind one screen — moving-average crossover, cross-sectional dual momentum, and **Python you write yourself**, sandboxed in a throwaway Docker container |
-| **Strategy terminal** | Script files, an editor and a run column sliding over any page — same sandbox as the bench |
 
 A user-written strategy reproduces the built-in engine to the cent — the same
 execution loop runs both. Tested against six real attacks; see
