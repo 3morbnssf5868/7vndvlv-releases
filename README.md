@@ -15,9 +15,8 @@ In development · **v0.1.0** · Windows · Android · Source private
 
 ![7vndvlv on desktop and on a phone, side by side](docs/hero.webp)
 
-*One React client, two shells — the portfolio on Windows and on a phone, in
-the offline demonstration mode. Built solo alongside a master's in finance,
-since June 2026.*
+*The same React client, wrapped for Windows and for Android — the portfolio
+shown here, in the offline demonstration mode.*
 
 ---
 
